@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">translate</string>
+
+    <string name="translate_button">Traduzir</string>
+    <string name="edit_text">Digite algo...</string>
+    <string name="contentDescription">Símbolo do Google Tradutor</string>
+
+
+</resources>
