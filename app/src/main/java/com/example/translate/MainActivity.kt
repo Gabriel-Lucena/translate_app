@@ -5,6 +5,12 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
+import com.example.translate.api.Endpoint
+import com.example.translate.util.NetworkUtils
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.Callback
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,40 +29,36 @@ class MainActivity : AppCompatActivity() {
         val translate_button = findViewById<Button>(R.id.translate_button)
 
         translate_button.setOnClickListener {
-             val translatedString = toTranslate(editTextTranslate.text.toString())
 
-            translated.text = translatedString
+            val translatedString = getEnglishWord(editTextTranslate.text.toString())
+
+            translated.text = translatedString.toString()
+
+            println(getEnglishWord(editTextTranslate.text.toString()))
+
         }
     }
 
+    fun getEnglishWord(portuguese_word: String) {
+        val retrofitClient = NetworkUtils
+            .getRetrofitInstance("http://192.168.0.183:3000/")
 
-    private fun toTranslate(portuguese_text: String): String {
+        val endpoint = retrofitClient.create(Endpoint::class.java)
+        val callback = endpoint.getEnglishWord(portuguese_word)
 
-            val result = when(portuguese_text) {
-                "cama" -> "bed"
-                "Cama" -> "Bed"
-
-                "colchão" -> "mattress"
-                "Colchão" -> "Mattress"
-
-                "travesseiro" -> "pillow"
-                "Travesseiro" -> "Pillow"
-
-                "lençol" -> "sheet"
-                "Lençol" -> "Sheet"
-
-                "escrivaninha" -> "writing desk"
-                "Escrivaninha" -> "Writing desk"
-
-                "cadeira" -> "chair"
-                "Cadeira" -> "Chair"
-
-                else -> "Palavra não encontrada"
+        callback.enqueue(object : Callback<String> {
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Toast.makeText(baseContext, t.message, Toast.LENGTH_SHORT).show()
+                println(t.message)
             }
 
-        return result
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                val traduzido = response.body().toString()
 
-
+                translated.text = traduzido
+            }
+        })
 
     }
+
 }
